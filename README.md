@@ -5,95 +5,176 @@ This is a solution to the [IP address tracker challenge on Frontend Mentor](http
 ## Table of contents
 
 - [Overview](#overview)
-  - [The challenge](#the-challenge)
+  - [Fitur](#fitur)
   - [Screenshot](#screenshot)
-  - [Links](#links)
-- [My process](#my-process)
-  - [Built with](#built-with)
-  - [What I learned](#what-i-learned)
-  - [Continued development](#continued-development)
-  - [Useful resources](#useful-resources)
-- [Author](#author)
-- [Acknowledgments](#acknowledgments)
+  - [Demo](#demo)
+- [Teknologi yang Digunakan](#teknologi-yang-digunakan)
+- [Instalasi dan Penggunaan](#instalasi-dan-penggunaan)
+- [Fitur Utama](#fitur-utama)
+- [API yang Digunakan](#api-yang-digunakan)
+- [Deployment](#deployment)
+- [Struktur Proyek](#struktur-proyek)
+- [Pembelajaran](#pembelajaran)
+- [Pengembangan Selanjutnya](#pengembangan-selanjutnya)
 
 ## Overview
 
-### The challenge
+### Fitur
 
-Users should be able to:
-
-- View the optimal layout for each page depending on their device's screen size
-- See hover states for all interactive elements on the page
-- See their own IP address on the map on the initial page load
-- Search for any IP addresses or domains and see the key information and location
+- 🌍 **Deteksi IP Otomatis**: Menampilkan IP publik pengguna secara otomatis saat halaman dimuat
+- 🔍 **Pencarian IP/Domain**: Mencari informasi detail untuk alamat IP atau domain tertentu
+- 📍 **Peta Interaktif**: Menampilkan lokasi geografis menggunakan Leaflet.js dengan OpenStreetMap
+- 📱 **Responsive Design**: Tampilan optimal untuk desktop, tablet, dan mobile
+- 🌐 **Deteksi IP Lokal**: Menampilkan IP lokal jaringan pengguna menggunakan WebRTC
+- ⚡ **Loading States**: Indikator loading yang informatif selama proses pencarian
+- 🎨 **Modern UI**: Desain yang bersih dan modern dengan hover effects
+- 🔄 **Real-time Updates**: Peta dan informasi diperbarui secara real-time
+- 🛡️ **Error Handling**: Penanganan error yang robust untuk berbagai skenario
+- 📊 **Detailed Information**: Menampilkan IP, lokasi, ISP, timezone, dan informasi lainnya
 
 ### Screenshot
 
-![](./public/images/desktop-preview.jpg)
+![Desktop Preview](./public/images/desktop-preview.jpg)
 
-_Ganti dengan screenshot solusi Anda yang sebenarnya. Anda dapat menemukan file `desktop-preview.jpg` di folder `public/images` sebagai referensi atau ambil yang baru._
+### Demo
 
-### Links
+- **Live Demo**: [GitHub Pages](https://your-username.github.io/ip-address-tracker-master/)
+- **Repository**: [GitHub Repository](https://github.com/your-username/ip-address-tracker-master)
 
-- Solution URL: [Add solution URL here](https://your-solution-url.com)
-- Live Site URL: [Add live site URL here](https://your-live-site-url.com)
+## Teknologi yang Digunakan
 
-## My process
+### Frontend
 
-### Built with
+- **React 18** - Library JavaScript untuk UI
+- **Vite** - Build tool dan development server
+- **CSS3** - Styling dengan custom properties dan Flexbox
+- **HTML5** - Semantic markup
 
-- Semantic HTML5 markup
-- CSS custom properties
-- Flexbox
-- Mobile-first workflow
-- [React](https://react.dev/) - JS library
-- [Vite](https://vitejs.dev/) - Build tool for React
-- [Leaflet.js](https://leafletjs.com/) - Interactive maps JavaScript library
-- [React-Leaflet](https://react-leaflet.js.org/) - React components for Leaflet maps
-- [ipapi.co](https://ipapi.co/) - IP Geolocation API
+### Maps & Geolocation
 
-### What I learned
+- **Leaflet.js** - Library peta interaktif
+- **React-Leaflet** - Komponen React untuk Leaflet
+- **OpenStreetMap** - Provider tile peta gratis
 
-Selama proses konversi proyek dari Vanilla JavaScript ke React Vite, saya banyak belajar tentang:
+### APIs
 
-- **Konversi Proyek JavaScript ke React**: Mengadaptasi struktur HTML dan logika JavaScript (manipulasi DOM, event listener) ke dalam komponen React dengan `useState` dan `useEffect`.
-- **Manajemen Aset Statis di Vite**: Memahami cara Vite menyajikan aset statis (gambar, favicon) dari folder `public` dan cara mereferensikannya menggunakan jalur absolut.
-- **Penanganan CORS dengan Vite Proxy**: Mengatasi masalah Cross-Origin Resource Sharing (CORS) dengan mengonfigurasi proxy di `vite.config.js` untuk meneruskan permintaan API.
-- **Penanganan Respons API yang Lebih Robust**: Mengimplementasikan penanganan kesalahan yang lebih baik untuk respons API, terutama ketika API mengembalikan respons non-JSON (seperti pesan "Too many requests") bahkan dengan status HTTP yang sukses.
-- **Integrasi Peta dengan React-Leaflet**: Menggunakan pustaka `react-leaflet` untuk mengintegrasikan peta Leaflet secara deklaratif dan mengelola instance peta dan marker dalam state React. Ini termasuk penyesuaian zoom peta dan penggunaan `useMap` hook.
+- **ipapi.co** - API geolokasi IP untuk informasi detail
+- **WebRTC** - Deteksi IP lokal jaringan
+
+### Development Tools
+
+- **ESLint** - Linting JavaScript
+- **pnpm** - Package manager
+
+## Instalasi dan Penggunaan
+
+### Prerequisites
+
+- Node.js (versi 16 atau lebih baru)
+- pnpm (atau npm/yarn)
+
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/your-username/ip-address-tracker-master.git
+cd ip-address-tracker-master
+
+# Install dependencies
+pnpm install
+
+# Jalankan development server
+pnpm dev
+
+# Build untuk production
+pnpm build
+
+# Preview build production
+pnpm preview
+```
+
+## Fitur Utama
+
+### 1. Deteksi IP Otomatis
+
+Aplikasi secara otomatis mendeteksi dan menampilkan IP publik pengguna saat halaman pertama kali dimuat, beserta informasi geografis lengkap.
 
 ```jsx
-// Contoh penggunaan react-leaflet untuk peta
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet"
-import "leaflet/dist/leaflet.css"
-import L from "leaflet"
-
-function MapUpdater({ ipData }) {
-  const map = useMap()
-  useEffect(() => {
-    if (ipData) {
-      map.setView([ipData.latitude, ipData.longitude], 15)
+useEffect(() => {
+  const fetchInitialIP = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch("/api/json/")
+      const data = await response.json()
+      setIpData(data)
+    } catch (error) {
+      console.error("Error fetching initial IP:", error)
+    } finally {
+      setLoading(false)
     }
-  }, [ipData, map])
-  return null
-}
+  }
 
-// ... di dalam komponen App
-;<MapContainer
-  center={initialPosition}
-  zoom={15}
-  scrollWheelZoom={true}
-  id="map"
->
+  fetchInitialIP()
+}, [])
+```
+
+### 2. Pencarian IP/Domain
+
+Pengguna dapat mencari informasi detail untuk alamat IP atau domain tertentu dengan validasi input yang robust.
+
+```jsx
+const handleSearch = async (searchTerm) => {
+  setLoading(true)
+  try {
+    const response = await fetch(`/api/${searchTerm}/json/`)
+    const data = await response.json()
+    setIpData(data)
+  } catch (error) {
+    setError("Invalid IP address or domain")
+  } finally {
+    setLoading(false)
+  }
+}
+```
+
+### 3. Deteksi IP Lokal
+
+Menggunakan WebRTC untuk mendeteksi IP lokal jaringan pengguna, memberikan perbedaan antara IP publik dan lokal.
+
+```jsx
+const getLocalIP = async () => {
+  try {
+    const pc = new RTCPeerConnection()
+    pc.createDataChannel("")
+    pc.createOffer().then((offer) => pc.setLocalDescription(offer))
+
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        const ip = event.candidate.candidate.split(" ")[4]
+        if (ip.match(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)) {
+          setLocalIP(ip)
+          pc.close()
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error getting local IP:", error)
+  }
+}
+```
+
+### 4. Peta Interaktif dengan React-Leaflet
+
+Integrasi peta yang seamless menggunakan React-Leaflet dengan custom markers dan dynamic updates.
+
+```jsx
+<MapContainer center={initialPosition} zoom={15} scrollWheelZoom={true}>
   <TileLayer
-    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   />
   {ipData && (
-    <Marker
-      position={[ipData.latitude, ipData.longitude]}
-      icon={customLocationIcon}
-    >
+    <Marker position={[ipData.latitude, ipData.longitude]} icon={customIcon}>
       <Popup>{ipData.ip}</Popup>
     </Marker>
   )}
@@ -101,13 +182,47 @@ function MapUpdater({ ipData }) {
 </MapContainer>
 ```
 
-```javascript
-// Contoh konfigurasi proxy di vite.config.js
-import { defineConfig } from "vite"
-import react from "@vitejs/plugin-react"
+### 5. State Management dengan React Hooks
 
+Penggunaan useState dan useEffect untuk manajemen state yang efisien dan lifecycle management.
+
+### 6. Responsive Design
+
+Layout yang responsif menggunakan CSS Flexbox dan media queries untuk pengalaman optimal di semua device.
+
+## API yang Digunakan
+
+### ipapi.co
+
+- **Endpoint**: `https://ipapi.co/{ip}/json/`
+- **Fitur**: Geolokasi IP, informasi ISP, timezone, dll
+- **Rate Limit**: 1,000 requests/day (gratis)
+
+### WebRTC (Local IP Detection)
+
+- **Teknologi**: RTCPeerConnection
+- **Fitur**: Deteksi IP lokal jaringan
+- **Kompatibilitas**: Modern browsers
+
+## Deployment
+
+### GitHub Pages
+
+```bash
+# Build project
+pnpm build
+
+# Deploy ke GitHub Pages
+# Upload isi folder 'dist' ke branch gh-pages
+```
+
+### Konfigurasi Vite
+
+```javascript
+// vite.config.js
 export default defineConfig({
   plugins: [react()],
+  base: "/ip-address-tracker-master/", // Sesuaikan dengan nama repo
   server: {
     proxy: {
       "/api": {
@@ -120,23 +235,82 @@ export default defineConfig({
 })
 ```
 
-### Continued development
+## Struktur Proyek
 
-Saya ingin terus fokus pada:
+```
+ip-address-tracker-master/
+├── public/
+│   └── images/          # Assets statis
+├── src/
+│   ├── App.jsx         # Komponen utama
+│   ├── App.css         # Styling utama
+│   └── main.jsx        # Entry point
+├── package.json        # Dependencies
+├── vite.config.js      # Konfigurasi Vite
+└── README.md          # Dokumentasi
+```
 
-- Mengoptimalkan performa React, terutama untuk komponen peta yang mungkin kompleks.
-- Meningkatkan penanganan error dan menampilkan pesan yang lebih ramah pengguna.
-- Menambahkan pengujian unit dan integrasi untuk memastikan fungsionalitas yang kuat.
-- Eksplorasi penggunaan React Context API atau Redux untuk manajemen state yang lebih kompleks jika aplikasi bertambah besar.
+## Pembelajaran
 
-### Useful resources
+### Konversi Vanilla JavaScript ke React
 
-- [Frontend Mentor](https://www.frontendmentor.io/) - Tantangan yang bagus untuk melatih keterampilan front-end.
-- [ipapi.co Documentation](https://ipapi.co/documentation/) - Dokumentasi untuk API geolokasi IP.
-- [Leaflet.js Documentation](https://leafletjs.com/reference.html) - Referensi untuk pustaka peta.
-- [React-Leaflet Documentation](https://react-leaflet.js.org/docs/start-introduction/) - Dokumentasi untuk komponen React Leaflet.
-- [Vite Official Documentation](https://vitejs.dev/guide/) - Panduan untuk build tool Vite, terutama bagian tentang Asset Handling dan Server Options (Proxy).
+- **State Management**: Mengadaptasi DOM manipulation tradisional ke React state management dengan useState
+- **Lifecycle Management**: Menggunakan useEffect untuk side effects dan API calls
+- **Event Handling**: Mengubah event listeners menjadi React event handlers
+- **Component Architecture**: Memecah UI menjadi komponen yang reusable dan maintainable
 
-## Author
+### Integrasi Peta dengan React-Leaflet
 
-- Frontend Mentor - [@nama_pengguna_Anda](https://www.frontendmentor.io/profile/yourusername)
+- **React Integration**: Menggunakan react-leaflet untuk integrasi yang lebih natural dengan React
+- **Custom Markers**: Implementasi custom marker icons untuk visual yang lebih menarik
+- **Dynamic Updates**: Menggunakan useMap hook untuk update peta secara dinamis
+- **Map State Management**: Mengelola state peta dalam React component
+
+### Penanganan API dan Error Handling
+
+- **Proxy Configuration**: Menggunakan Vite proxy untuk mengatasi CORS issues di development
+- **Robust Error Handling**: Implementasi try-catch yang comprehensive untuk berbagai error scenarios
+- **Loading States**: UX yang lebih baik dengan loading indicators
+- **API Response Validation**: Validasi response API sebelum update state
+
+### Build dan Deployment
+
+- **Vite Configuration**: Konfigurasi base path untuk GitHub Pages deployment
+- **Asset Management**: Penanganan static assets di Vite build process
+- **Production Optimization**: Optimisasi untuk production build
+- **Environment Handling**: Perbedaan konfigurasi untuk development dan production
+
+### Modern React Patterns
+
+- **Functional Components**: Penggunaan functional components dengan hooks
+- **Custom Hooks**: Potensi untuk extract logic ke custom hooks
+- **Performance Optimization**: Memoization dan optimization techniques
+- **Code Organization**: Struktur kode yang clean dan maintainable
+
+### WebRTC Integration
+
+- **Local IP Detection**: Implementasi WebRTC untuk deteksi IP lokal
+- **Browser Compatibility**: Handling untuk browser yang tidak support WebRTC
+- **Error Handling**: Graceful fallback ketika WebRTC tidak tersedia
+
+## Pengembangan Selanjutnya
+
+### Fitur yang Direncanakan
+
+- [ ] **History Pencarian**: Menyimpan riwayat pencarian IP
+- [ ] **Export Data**: Export informasi IP ke CSV/JSON
+- [ ] **Multiple Map Providers**: Opsi provider peta (Google Maps, Mapbox)
+- [ ] **Dark Mode**: Toggle tema gelap/terang
+- [ ] **Offline Support**: Service worker untuk caching
+- [ ] **Unit Tests**: Testing dengan Jest dan React Testing Library
+
+### Optimisasi
+
+- [ ] **Performance**: Lazy loading untuk komponen peta
+- [ ] **Accessibility**: ARIA labels dan keyboard navigation
+- [ ] **SEO**: Meta tags dan structured data
+- [ ] **PWA**: Progressive Web App features
+
+---
+
+**Dibuat dengan ❤️ menggunakan React dan Vite**
