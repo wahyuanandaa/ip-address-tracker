@@ -8,10 +8,19 @@ function App() {
   const [ipData, setIpData] = useState(null)
   const [ipInput, setIpInput] = useState("")
   const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [localIp, setLocalIp] = useState(null)
 
   const fetchIpData = async (ipAddress = "") => {
+    setIsLoading(true)
+    setError(null)
+
     try {
-      const res = await fetch(`/api/${ipAddress}/json/`)
+      const url = ipAddress
+        ? `https://ipapi.co/${ipAddress}/json/`
+        : "https://ipapi.co/json/"
+
+      const res = await fetch(url)
 
       if (!res.ok) {
         const errorText = await res.text()
@@ -26,6 +35,10 @@ function App() {
         throw new Error(`API Response Error: ${errorText}`)
       }
 
+      if (!data) {
+        throw new Error("API returned no valid data.")
+      }
+
       if (data.error) {
         throw new Error(data.reason)
       }
@@ -36,6 +49,8 @@ function App() {
       // Show modal
       const modal = document.getElementById("modal")
       if (modal) modal.showModal()
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -55,6 +70,8 @@ function App() {
   useEffect(() => {
     // Initial fetch
     fetchIpData()
+    // Get local IP
+    getLocalIp()
   }, [])
 
   const handleSubmit = (e) => {
@@ -70,12 +87,45 @@ function App() {
   }
 
   const customLocationIcon = L.icon({
-    iconUrl: "/images/icon-location.svg",
+    iconUrl: "/ip-address-tracker/images/icon-location.svg",
     iconSize: [35, 35],
     iconAnchor: [15, 15]
   })
 
-  const initialPosition = [0, 0] // Posisi awal sebelum data IP dimuat
+  const initialPosition = [20, 0] // Posisi awal menampilkan peta dunia
+
+  // Fungsi untuk mendapatkan IP lokal
+  const getLocalIp = async () => {
+    try {
+      // Menggunakan WebRTC untuk mendapatkan IP lokal
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+      })
+
+      pc.createDataChannel("")
+      pc.createOffer().then((offer) => pc.setLocalDescription(offer))
+
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/
+          const match = ipRegex.exec(event.candidate.candidate)
+          if (match) {
+            const ip = match[1]
+            // Filter IP lokal (bukan public IP)
+            if (
+              ip.startsWith("192.168.") ||
+              ip.startsWith("10.") ||
+              ip.startsWith("172.")
+            ) {
+              setLocalIp(ip)
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Tidak bisa mendapatkan IP lokal:", err)
+    }
+  }
 
   return (
     <main>
@@ -86,43 +136,63 @@ function App() {
             type="text"
             id="ip-input"
             autoFocus
-            placeholder="Search for any IP address or domain"
+            placeholder="Search for any IP address or domain (e.g., 8.8.8.8, google.com)"
             value={ipInput}
             onChange={(e) => setIpInput(e.target.value)}
           />
           <button type="submit">
-            <img src="/images/icon-arrow.svg" alt="Submit Button" />
+            <img
+              src="/ip-address-tracker/images/icon-arrow.svg"
+              alt="Submit Button"
+            />
           </button>
         </form>
         <div className="info" id="info">
           <div className="box ip-info-box">
-            <span className="field-name">ip address</span>
+            <span className="field-name">ip address (public)</span>
             <span className="info-field" id="ip-info">
-              {ipData?.ip || "Loading..."}
+              {isLoading
+                ? "Detecting your IP..."
+                : ipData?.ip || "Not available"}
             </span>
           </div>
+          {localIp && (
+            <div
+              className="box ip-info-box"
+              style={{ backgroundColor: "#f0f0f0" }}
+            >
+              <span className="field-name">ip address (local)</span>
+              <span className="info-field" id="local-ip-info">
+                {localIp}
+              </span>
+            </div>
+          )}
           <div className="box location-info-box">
             <span className="field-name">location</span>
             <span className="info-field" id="location-info">
-              {ipData
+              {isLoading
+                ? "Getting your location..."
+                : ipData
                 ? `${ipData.city}, ${ipData.region}, ${ipData.country_name}`
-                : "Loading..."}
+                : "Not available"}
             </span>
           </div>
           <div className="box timezone-info-box">
             <span className="field-name">timezone</span>
             <span className="info-field" id="timezone-info">
-              {ipData
+              {isLoading
+                ? "Detecting timezone..."
+                : ipData
                 ? `UTC: ${ipData.utc_offset?.slice(0, 3) || ""}:${
                     ipData.utc_offset?.slice(3) || ipData.timezone
                   }`
-                : "Loading..."}
+                : "Not available"}
             </span>
           </div>
           <div className="box isp-info-box">
             <span className="field-name">isp</span>
             <span className="info-field" id="isp-info">
-              {ipData?.org || "Loading..."}
+              {isLoading ? "Detecting ISP..." : ipData?.org || "Not available"}
             </span>
           </div>
         </div>
@@ -140,7 +210,7 @@ function App() {
 
       <MapContainer
         center={initialPosition}
-        zoom={15}
+        zoom={2}
         scrollWheelZoom={true}
         id="map"
       >
@@ -158,53 +228,6 @@ function App() {
         )}
         <MapUpdater ipData={ipData} />
       </MapContainer>
-
-      <footer className="footer">
-        <p>
-          Engineered with love by{" "}
-          <a
-            href="https://github.com/himanshuat"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Himanshu Tegyalwar
-          </a>
-        </p>
-        <div className="social">
-          <a
-            href="https://www.facebook.com/himanshu.tegyalwar"
-            aria-label="Facebook"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <i className="fab fa-facebook"></i>
-          </a>
-          <a
-            href="https://www.instagram.com/himaanshu.at"
-            aria-label="Instagram"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <i className="fab fa-instagram"></i>
-          </a>
-          <a
-            href="https://twitter.com/himanshuat_"
-            aria-label="X(formerly Twitter)"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <i className="fab fa-twitter"></i>
-          </a>
-          <a
-            href="https://www.linkedin.com/in/himanshu-tegyalwar"
-            aria-label="LinkedIn"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <i className="fab fa-linkedin"></i>
-          </a>
-        </div>
-      </footer>
     </main>
   )
 }
