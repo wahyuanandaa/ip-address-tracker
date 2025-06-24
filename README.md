@@ -38,8 +38,8 @@ This is a solution to the [IP address tracker challenge on Frontend Mentor](http
 
 ### Demo
 
-- **Live Demo**: [GitHub Pages](https://your-username.github.io/ip-address-tracker-master/)
-- **Repository**: [GitHub Repository](https://github.com/your-username/ip-address-tracker-master)
+- **Live Demo**: [GitHub Pages](https://wahyuanandaa.github.io/ip-address-tracker/)
+- **Repository**: [GitHub Repository](https://github.com/wahyuanandaa/ip-address-tracker)
 
 ## Teknologi yang Digunakan
 
